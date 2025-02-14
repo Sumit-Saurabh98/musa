@@ -29,6 +29,11 @@ model User {
   assignedTasks Task[] @relation("AssignedTasks")
 }
 
+model Organization {
+  id String @id @default(uuid())
+  
+}
+
 model Project {
   id        String  @id @default(uuid())
   description String?

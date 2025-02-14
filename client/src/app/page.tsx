@@ -5,9 +5,12 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Sparkles, Users, BarChart3, Zap } from "lucide-react";
 import Image from "next/image";
+import { useAuthStore } from "@/stores/authStore";
 
 export default function Home() {
   const router = useRouter();
+
+  const {user} = useAuthStore()
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-indigo-950 via-black to-purple-950">
@@ -16,17 +19,28 @@ export default function Home() {
         <div className="max-w-7xl mx-auto flex justify-between items-center py-4 px-6">
           <div className="flex items-center gap-2">
             <Sparkles className="w-8 h-8 text-purple-400" />
-            <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-400">
+            <h1 onClick={() => router.push("/")} className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-400 hover:cursor-pointer">
               MUSA
             </h1>
           </div>
           <div className="flex gap-4 items-center">
-            <Button variant="ghost" className="text-white/80 hover:text-white" onClick={() => router.push("/login")}>
-              Log in
-            </Button>
+            {user ? (
+              <p 
+                className="text-gray-300 text-md font-semibold"
+              >
+                Welcome {user.name}
+              </p>
+            ) : (
+              <Button 
+                className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white"
+                onClick={() => router.push("/login")}
+              >
+                Sign In
+              </Button>
+            )}
             <Button 
               className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white"
-              onClick={() => router.push("/signup")}
+              onClick={() => router.push("/register")}
             >
               Get Started
             </Button>
@@ -85,7 +99,7 @@ export default function Home() {
               <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg blur opacity-30"></div>
               <div className="relative">
                 <Image
-                  src="/dashboard-showcase.png"
+                  src="/jira.png"
                   alt="MUSA Dashboard"
                   width={600}
                   height={400}
