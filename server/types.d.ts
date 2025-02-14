@@ -1,9 +1,12 @@
 // ... existing code ...
 import * as express from 'express';
+import { IUser } from './src/models';
+
 declare global {
     namespace Express {
       interface Request {
-        user?: any; // You can replace 'any' with a more specific type if needed
+        user?: IUser;
+        file?: Express.Multer.File;
       }
     }
   }

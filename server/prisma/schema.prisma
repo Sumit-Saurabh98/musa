@@ -18,8 +18,57 @@ model User {
   name      String
   email     String  @unique
   password  String?
-  provider  String
-  socialId  String? @unique
+  socialId String? @unique
+  provider  String  // "local" for email/password, "google" for OAuth
+  subscriptionStatus String  @default("inactive") // "active" or "inactive"
+  stripeCustomerId String? // Stripe Customer ID
+  projects  Project[]
+  teams     TeamMember[]
   createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  assignedTasks Task[] @relation("AssignedTasks")
 }
+
+model Project {
+  id        String  @id @default(uuid())
+  description String?
+  name      String
+  ownerId   String
+  owner     User    @relation(fields: [ownerId], references: [id])
+  tasks     Task[]
+  team      Team?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Task {
+  id        String  @id @default(uuid())
+  title     String
+  status    String
+  description String?
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id])
+  assignedToId String?
+  assignedTo  User?  @relation(fields: [assignedToId], references: [id], name: "AssignedTasks")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Team {
+  id        String  @id @default(uuid())
+  name      String
+  project   Project @relation(fields: [id], references: [id])
+  members   TeamMember[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TeamMember {
+  id      String  @id @default(uuid())
+  userId  String
+  teamId  String
+  user    User   @relation(fields: [userId], references: [id])
+  team    Team   @relation(fields: [teamId], references: [id])
+  role    String // "Owner", "Member"
+}
+

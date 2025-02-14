@@ -1,17 +1,24 @@
 import { Request, Response, NextFunction } from "express";
-import jwt from "jsonwebtoken";
+import { verifyToken } from "../utils/jwt";
 
-const JWT_SECRET = process.env.JWT_SECRET as string;
-
-export const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
-  const token = req.header("Authorization")?.split(" ")[1];
-  if (!token) return res.status(401).json({ message: "Unauthorized" });
-
+/**
+ * Middleware to check if user is authenticated
+ */
+export const isAuthenticated = (req: Request, res: Response, next: NextFunction) : void => {
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    req.user = decoded;
+    // Get token from cookie
+    const token = req.cookies.token;
+    if (!token){
+        res.status(401).json({ error: "Unauthorized" });
+        return;
+    } 
+
+    // Verify token
+    const decoded = verifyToken(token);
+    (req as any).user = decoded.userId;
+
     next();
   } catch (error) {
-    return res.status(403).json({ message: "Invalid token" });
+    res.status(401).json({ error: "Invalid token" });
   }
 };
